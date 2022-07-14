@@ -19,12 +19,13 @@ contract SimpleStorage {
 
     People[] public people;
 
+
     function addPerson(string calldata _name, uint256 _favoriteNumber) public {
             people.push(People(_favoriteNumber,_name));
             nameToFoavoriteNumber[_name] = _favoriteNumber;
     }
 
-    function store(uint256 _fravoriteNumber) public {
+    function store(uint256 _fravoriteNumber) public virtual {
         favoriteNumber = _fravoriteNumber;
     }
 
