@@ -1,5 +1,5 @@
 /*
-    Get Funds from users. 
+    Get Funds from users.
     Withdraw funds
     Set a minim funding value in GBP.
 */
@@ -19,7 +19,7 @@ contract FundMe {
     uint256 public constant MINIMUM_USD = 50 * 1e18; // 1 * 1 ** 18;
 
     address[] public funders;
-    mapping(address => uint256) public addressToAmountFunded; 
+    mapping(address => uint256) public addressToAmountFunded;
     address public immutable i_owner;
     // 23644 - non immutble
     // 21508 - immutable
@@ -34,13 +34,13 @@ contract FundMe {
     - Nonce: tx count for the amount
     - Gas Price: price per unit of was (wei)
     - Gas Limit 21000
-    - To: address that the TX is sent to. 
+    - To: address that the TX is sent to.
     - Value: Amount of wei
     - Data: Empty
     - v,r,s, components of tx signature.
     */
     function fund() public payable {
-        
+
         // require means it happens or fails.
         require(msg.value.getConversionRate() > MINIMUM_USD, "Didnt Send Enought!"); // 1e18 = 1 X 10 ** 18 === 1000000000000000000
         //msg is global var.
@@ -51,7 +51,7 @@ contract FundMe {
     function withdraw() public onlyOwner{
 
         //require(msg.sender == owner, "You are not the owner!");
-        
+
         for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++)
         {
             addressToAmountFunded[funders[funderIndex]] = 0;
@@ -87,4 +87,3 @@ contract FundMe {
         fund();
     }
 }
-
