@@ -3,3 +3,5 @@
 
 *.bin
 *.abi
+*.env
+.encryptedKey.json
