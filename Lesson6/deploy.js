@@ -1,12 +1,16 @@
 const ethers = require("ethers");
 const fs = require("fs-extra");
+require("dotenv").config();
 
 async function main() {
-    const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:7545");
-    const wallet = new ethers.Wallet(
-        "**WALLET PRIVATE KEY** ",
-         provider
-         );
+    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+    const encryptedJson = fs.readFileSync("./.encryptedKey.json", "utf-8");
+    let wallet = new ethers.Wallet.fromEncryptedJsonSync(
+        encryptedJson,
+        process.env.PRIVATE_KEY_PASS
+    );
+
+    wallet = await wallet.connect(provider);
 
     const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf-8");
     const bin = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.bin", "utf-8");
@@ -20,26 +24,20 @@ async function main() {
     console.log("here is the transaction reciept");
     console.log(deploymentReciept);
 
+    // Retrieve Fav number from SimpleStorage.sol function
+    const currentFavoriteNumber = await contract.retrieve();
+    console.log("Current Favorite Number: " + currentFavoriteNumber.toString());
 
-    // manual trasnsaction RAW.
-    // const nonce = await wallet.getTransactionCount();
-    // const tx = {
-    //     nonce: nonce,
-    //     gasPrice: 20000000000,
-    //     gasLimit: 1000000,
-    //     to: null,
-    //     value: 0,
-    //     data: "0x .bin DATA"
-    // }
-    // const sendTxtResponse = await wallet.sendTransaction(tx);
-    // await sendTxtResponse.wait(1);
-    // console.log(sendTxtResponse);
-
+    // Update Fav number from SimpleStorage.sol function
+    const transactionResponse = await contract.store("7");
+    const transactionRecipet = await transactionResponse.wait(1);
+    const updatedFavoriteNumber = await contract.retrieve()
+    console.log("Updated Favorite Number: " + updatedFavoriteNumber);
 }
 
 main()
-.then(() => process.exit(0))
-.catch(error => {
-    console.log(error);
-    procexs.exit(1);
-});
+    .then(() => process.exit(0))
+    .catch(error => {
+        console.log(error);
+        process.exit(1);
+    });
