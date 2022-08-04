@@ -1,5 +1,5 @@
 /*
-    Get Funds from users.
+    Get Funds from users. 
     Withdraw funds
     Set a minim funding value in GBP.
 */
@@ -9,23 +9,18 @@ pragma solidity ^0.8.0;
 
 import "./PriceConverter.sol";
 
-error NotOwner();
-
 contract FundMe {
 
     using PriceConverter for uint256;
 
-    // constant & immutable better gas usage.
-    uint256 public constant MINIMUM_USD = 50 * 1e18; // 1 * 1 ** 18;
+    uint256 public MinimumUSD = 50 * 1e18; // 1 * 1 ** 18;
 
     address[] public funders;
-    mapping(address => uint256) public addressToAmountFunded;
-    address public immutable i_owner;
-    // 23644 - non immutble
-    // 21508 - immutable
+    mapping(address => uint256) public addressToAmountFunded; 
+    address public owner;
 
     constructor() {
-        i_owner = msg.sender;
+        owner = msg.sender;
     }
     /*
      set min amount in GBP
@@ -34,15 +29,15 @@ contract FundMe {
     - Nonce: tx count for the amount
     - Gas Price: price per unit of was (wei)
     - Gas Limit 21000
-    - To: address that the TX is sent to.
+    - To: address that the TX is sent to. 
     - Value: Amount of wei
     - Data: Empty
     - v,r,s, components of tx signature.
     */
     function fund() public payable {
-
+        
         // require means it happens or fails.
-        require(msg.value.getConversionRate() > MINIMUM_USD, "Didnt Send Enought!"); // 1e18 = 1 X 10 ** 18 === 1000000000000000000
+        require(msg.value.getConversionRate() > MinimumUSD, "Didnt Send Enought!"); // 1e18 = 1 X 10 ** 18 === 1000000000000000000
         //msg is global var.
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] = msg.value;
@@ -51,7 +46,7 @@ contract FundMe {
     function withdraw() public onlyOwner{
 
         //require(msg.sender == owner, "You are not the owner!");
-
+        
         for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++)
         {
             addressToAmountFunded[funders[funderIndex]] = 0;
@@ -74,16 +69,8 @@ contract FundMe {
     }
 
     modifier onlyOwner {
-        //require(msg.sender == i_owner, "You are not the owner!");
-        if(msg.sender != i_owner) { revert NotOwner(); }
+        require(msg.sender == owner, "You are not the owner!");
         _;
     }
-
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
-    }
 }
+

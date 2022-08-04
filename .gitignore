@@ -5,3 +5,5 @@
 *.abi
 *.env
 .encryptedKey.json
+gas-report.txt
+coverage.json
