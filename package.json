@@ -8,5 +8,8 @@
   },
   "scripts": {
     "compile": "node_modules/.bin/solcjs --bin --abi --include-path /node_modules/ --base-path . -o . Lesson6/SimpleStorage.sol"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.1.8"
   }
 }
